@@ -1,0 +1,1790 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>HKU ThermoSense V3</title>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+/* ════════════════════════════════════════════════
+   DESIGN TOKENS
+════════════════════════════════════════════════ */
+:root{
+  --font:'Epilogue',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --r:14px;--r-lg:20px;--r-sm:8px;
+  --gap:16px;
+  --nav:64px;
+  --ease:cubic-bezier(.4,0,.2,1);
+}
+
+[data-theme="dark"]{
+  --bg:#04080f;
+  --bg2:#080e1a;
+  --s1:#0c1524;
+  --s2:#111d2e;
+  --s3:#162135;
+  --border:rgba(255,255,255,0.06);
+  --border2:rgba(255,255,255,0.12);
+  --t1:#dde8f8;
+  --t2:#6b84a0;
+  --t3:#2d4260;
+  --a1:#2d9cff;
+  --a1g:rgba(45,156,255,0.15);
+  --a2:#00f0a0;
+  --a2g:rgba(0,240,160,0.12);
+  --a3:#ff6b6b;
+  --a3g:rgba(255,107,107,0.12);
+  --a4:#ffa94d;
+  --a5:#c084fc;
+  --a5g:rgba(192,132,252,0.12);
+  --a6:#38bdf8;
+  --sh:0 4px 24px rgba(0,0,0,.5);
+  --sh2:0 8px 48px rgba(0,0,0,.7);
+  --navbg:rgba(4,8,15,0.92);
+}
+
+[data-theme="light"]{
+  --bg:#f4f7ff;
+  --bg2:#eaeffb;
+  --s1:#ffffff;
+  --s2:#f8faff;
+  --s3:#f0f4fe;
+  --border:rgba(0,0,0,0.07);
+  --border2:rgba(0,0,0,0.14);
+  --t1:#0c1524;
+  --t2:#4a6080;
+  --t3:#99afc8;
+  --a1:#1a7fd4;
+  --a1g:rgba(26,127,212,0.08);
+  --a2:#008c5a;
+  --a2g:rgba(0,140,90,0.08);
+  --a3:#d42040;
+  --a3g:rgba(212,32,64,0.08);
+  --a4:#b85c00;
+  --a5:#7c3aed;
+  --a5g:rgba(124,58,237,0.08);
+  --a6:#0ea5e9;
+  --sh:0 4px 24px rgba(100,140,200,0.12);
+  --sh2:0 8px 48px rgba(100,140,200,0.2);
+  --navbg:rgba(244,247,255,0.94);
+}
+
+/* ════════════════════════════════════════════════
+   BASE
+════════════════════════════════════════════════ */
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:var(--font);background:var(--bg);
+  color:var(--t1);min-height:100vh;overflow-x:hidden;
+  font-size:14px;line-height:1.6;
+  transition:background .3s var(--ease),color .3s var(--ease);
+}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 100% 60% at 10% 5%,var(--a1g) 0%,transparent 55%),
+    radial-gradient(ellipse 70% 50% at 90% 95%,var(--a2g) 0%,transparent 55%),
+    radial-gradient(ellipse 50% 40% at 80% 20%,var(--a5g) 0%,transparent 60%);
+}
+
+/* ════════════════════════════════════════════════
+   NAV
+════════════════════════════════════════════════ */
+.nav{
+  position:fixed;top:0;left:0;right:0;height:var(--nav);
+  background:var(--navbg);backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+  z-index:1000;
+  display:flex;align-items:center;
+  padding:0 20px;gap:16px;
+}
+.nav-logo{
+  display:flex;align-items:center;gap:10px;
+  font-size:15px;font-weight:800;letter-spacing:-.04em;
+  white-space:nowrap;
+}
+.nav-logo-mark{
+  width:30px;height:30px;border-radius:8px;
+  background:linear-gradient(135deg,var(--a1),var(--a5));
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;flex-shrink:0;
+}
+.nav-badge{
+  font-family:var(--mono);font-size:9px;
+  background:linear-gradient(135deg,var(--a1),var(--a5));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;letter-spacing:.06em;
+  border:1px solid var(--border2);border-radius:4px;padding:2px 6px;
+  -webkit-text-fill-color:var(--a1);
+}
+.nav-tabs{
+  display:flex;gap:2px;overflow-x:auto;flex:1;
+  scrollbar-width:none;
+}
+.nav-tabs::-webkit-scrollbar{display:none;}
+.nav-tab{
+  padding:7px 14px;border-radius:8px;
+  font-size:12px;font-weight:600;white-space:nowrap;
+  color:var(--t2);cursor:pointer;border:none;
+  background:transparent;font-family:var(--font);
+  transition:all .2s;
+}
+.nav-tab.active,.nav-tab:hover{
+  background:var(--a1g);color:var(--a1);
+}
+.nav-r{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.live-pill{
+  display:flex;align-items:center;gap:5px;
+  background:var(--a2g);border:1px solid rgba(0,240,160,.2);
+  border-radius:999px;padding:4px 10px;
+  font-family:var(--mono);font-size:9px;color:var(--a2);
+  letter-spacing:.08em;
+}
+.live-d{
+  width:5px;height:5px;border-radius:50%;background:var(--a2);
+  animation:lp 1.5s infinite;
+}
+@keyframes lp{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,240,160,.5);}50%{opacity:.5;box-shadow:0 0 0 4px rgba(0,240,160,0);}}
+.theme-btn{
+  width:38px;height:22px;background:var(--s2);
+  border:1px solid var(--border2);border-radius:999px;
+  cursor:pointer;position:relative;transition:background .3s;
+}
+.theme-btn::after{
+  content:'';position:absolute;top:2px;left:2px;
+  width:16px;height:16px;border-radius:50%;
+  background:var(--a1);box-shadow:0 0 8px var(--a1);
+  transition:transform .3s var(--ease),background .3s;
+}
+[data-theme="light"] .theme-btn::after{
+  transform:translateX(16px);background:#f59e0b;box-shadow:0 0 8px #f59e0b;
+}
+
+/* ════════════════════════════════════════════════
+   LAYOUT
+════════════════════════════════════════════════ */
+.page{
+  position:relative;z-index:1;
+  max-width:1280px;margin:0 auto;
+  padding:calc(var(--nav) + 24px) 20px 80px;
+}
+.sec{margin-bottom:52px;}
+.sec-hd{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  margin-bottom:18px;flex-wrap:wrap;gap:10px;
+}
+.sec-title{font-size:18px;font-weight:800;letter-spacing:-.03em;}
+.sec-sub{
+  font-family:var(--mono);font-size:10px;
+  color:var(--t3);letter-spacing:.1em;margin-top:2px;
+}
+.sec-actions{display:flex;gap:6px;flex-wrap:wrap;}
+
+/* Card */
+.card{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r-lg);box-shadow:var(--sh);
+  transition:background .3s,border-color .3s;
+}
+.p16{padding:16px;} .p20{padding:20px;} .p24{padding:24px;}
+
+/* Grids */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap);}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--gap);}
+@media(max-width:1024px){.g4{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:768px){.g2,.g3{grid-template-columns:1fr;}}
+@media(max-width:600px){.g4{grid-template-columns:1fr 1fr;}}
+@media(max-width:400px){.g4{grid-template-columns:1fr;}}
+
+/* Label */
+.lbl{
+  font-family:var(--mono);font-size:9px;
+  letter-spacing:.14em;color:var(--t3);
+  text-transform:uppercase;margin-bottom:6px;
+}
+
+/* Chips */
+.chip{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 9px;border-radius:999px;
+  font-size:10px;font-weight:600;font-family:var(--mono);
+}
+
+/* Divider */
+.div{height:1px;background:var(--border);margin:16px 0;}
+
+/* ════════════════════════════════════════════════
+   SENSOR HERO CARDS
+════════════════════════════════════════════════ */
+.sensor-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 340px;
+  gap:var(--gap);
+}
+@media(max-width:1100px){.sensor-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:680px){.sensor-grid{grid-template-columns:1fr;}}
+
+.sensor-card{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:22px;
+  box-shadow:var(--sh);position:relative;overflow:hidden;
+  transition:background .3s,border-color .3s;
+}
+.sc-accent{
+  position:absolute;top:0;left:0;right:0;height:3px;
+  border-radius:var(--r-lg) var(--r-lg) 0 0;
+}
+.sc-glow{
+  position:absolute;top:-80px;right:-60px;
+  width:200px;height:200px;border-radius:50%;
+  opacity:.07;filter:blur(40px);pointer-events:none;
+}
+.sc-id{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--mono);font-size:11px;font-weight:600;
+  padding:3px 10px;border-radius:6px;margin-bottom:14px;
+}
+.sc-temp{
+  font-size:clamp(44px,7vw,72px);font-weight:900;
+  letter-spacing:-.05em;line-height:1;margin-bottom:4px;
+}
+.sc-humi{font-size:20px;font-weight:600;margin-bottom:12px;}
+.sc-status{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:6px 14px;border-radius:999px;
+  font-size:12px;font-weight:700;
+}
+.sc-loc{
+  margin-top:12px;font-size:11px;color:var(--t2);
+  font-family:var(--mono);
+}
+.sc-time{font-size:10px;color:var(--t3);font-family:var(--mono);margin-top:2px;}
+
+/* AVG CARD */
+.avg-card{
+  background:linear-gradient(135deg,var(--s1) 0%,var(--s2) 100%);
+  border:1px solid var(--border);border-radius:var(--r-lg);
+  padding:22px;box-shadow:var(--sh);
+  display:flex;flex-direction:column;justify-content:space-between;
+}
+@media(max-width:1100px){.avg-card{grid-column:1/-1;}}
+
+.avg-title{font-size:13px;font-weight:700;margin-bottom:4px;}
+.avg-sub{font-size:11px;color:var(--t2);margin-bottom:20px;}
+.avg-temp{
+  font-size:52px;font-weight:900;letter-spacing:-.05em;
+  background:linear-gradient(135deg,var(--a1),var(--a5));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;line-height:1;
+}
+.avg-row{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:16px;
+}
+.avg-mini{text-align:center;}
+.avg-mini-val{font-size:18px;font-weight:700;}
+.avg-mini-lbl{font-size:10px;color:var(--t2);font-family:var(--mono);}
+
+/* Mini stat badge */
+.delta{
+  font-family:var(--mono);font-size:10px;
+  padding:2px 7px;border-radius:4px;margin-top:4px;
+}
+
+/* ════════════════════════════════════════════════
+   STAT ROW
+════════════════════════════════════════════════ */
+.stat-mini{padding:14px 16px;}
+.stat-mini .icon{font-size:18px;margin-bottom:6px;}
+.stat-mini .val{font-size:20px;font-weight:800;margin-bottom:1px;}
+.stat-mini .lbl2{font-size:10px;color:var(--t2);}
+
+/* ════════════════════════════════════════════════
+   CHART AREA
+════════════════════════════════════════════════ */
+.chart-hd{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;flex-wrap:wrap;gap:8px;
+}
+.chart-title{font-size:13px;font-weight:700;}
+.legend{display:flex;gap:14px;flex-wrap:wrap;}
+.leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t2);}
+.leg-d{width:8px;height:8px;border-radius:50%;}
+.range-tabs{display:flex;gap:4px;}
+.rtab{
+  padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;
+  border:1px solid var(--border);background:transparent;
+  color:var(--t2);cursor:pointer;font-family:var(--font);
+  transition:all .2s;
+}
+.rtab.active{background:var(--a1);color:#fff;border-color:var(--a1);}
+
+/* ════════════════════════════════════════════════
+   WEEKLY TRENDS
+════════════════════════════════════════════════ */
+.week-grid{
+  display:grid;grid-template-columns:repeat(7,1fr);gap:8px;
+  margin-bottom:16px;
+}
+@media(max-width:900px){.week-grid{grid-template-columns:repeat(4,1fr);}}
+@media(max-width:500px){.week-grid{grid-template-columns:repeat(2,1fr);}}
+.day-card{
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:var(--r);padding:12px 10px;text-align:center;
+}
+.day-nm{font-size:10px;font-weight:700;color:var(--t2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;}
+.period{display:flex;flex-direction:column;gap:5px;}
+.pi{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:3px 7px;border-radius:5px;background:var(--border);
+  font-size:10px;
+}
+.pi .pl{color:var(--t2);font-size:9px;}
+.pi .pv{font-weight:700;font-size:11px;}
+
+/* ════════════════════════════════════════════════
+   AI PANEL
+════════════════════════════════════════════════ */
+.ai-wrap{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);}
+@media(max-width:768px){.ai-wrap{grid-template-columns:1fr;}}
+
+.ai-card{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:22px;box-shadow:var(--sh);
+  position:relative;overflow:hidden;
+}
+.ai-card::before{
+  content:'';position:absolute;top:-50px;left:-50px;
+  width:200px;height:200px;border-radius:50%;
+  background:var(--a5g);filter:blur(40px);pointer-events:none;
+}
+.ai-hd{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.ai-icon{
+  width:36px;height:36px;border-radius:10px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--a5),var(--a1));
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+}
+.ai-name{font-size:13px;font-weight:700;}
+.ai-hall{font-size:10px;color:var(--t2);font-family:var(--mono);}
+.ai-pred-box{
+  background:var(--a5g);border:1px solid rgba(192,132,252,.15);
+  border-radius:var(--r);padding:14px;margin-bottom:12px;
+}
+.ai-pred-n{font-size:9px;color:var(--t2);font-family:var(--mono);letter-spacing:.1em;margin-bottom:4px;}
+.ai-pred-t{font-size:30px;font-weight:900;color:var(--a5);letter-spacing:-.04em;}
+.ai-pred-3h{font-size:11px;color:var(--t2);margin-top:4px;}
+.ai-pred-desc{font-size:12px;color:var(--t1);line-height:1.6;margin-top:8px;}
+.ai-tip{
+  display:flex;align-items:flex-start;gap:10px;
+  background:rgba(255,169,77,.08);border:1px solid rgba(255,169,77,.15);
+  border-radius:var(--r-sm);padding:11px;margin-bottom:12px;
+  font-size:12px;line-height:1.5;
+}
+.ai-conf{display:flex;align-items:center;gap:8px;font-size:10px;color:var(--t2);font-family:var(--mono);}
+.conf-bg{flex:1;height:4px;background:var(--border);border-radius:999px;overflow:hidden;}
+.conf-f{height:100%;background:linear-gradient(90deg,var(--a5),var(--a1));border-radius:999px;}
+.ai-sim-note{
+  margin-top:10px;padding:8px 10px;
+  background:rgba(255,211,61,.06);border:1px solid rgba(255,211,61,.15);
+  border-radius:6px;font-size:10px;color:#ffd93d;font-family:var(--mono);
+}
+.ai-hall-tabs{display:flex;gap:5px;margin-bottom:14px;}
+.aht{
+  padding:6px 13px;border-radius:7px;font-size:11px;font-weight:600;
+  border:1px solid var(--border);background:transparent;
+  color:var(--t2);cursor:pointer;font-family:var(--font);transition:all .2s;
+}
+.aht.active{background:var(--a5g);border-color:var(--a5);color:var(--a5);}
+
+/* ════════════════════════════════════════════════
+   HEATMAP + FLOOR PLAN
+════════════════════════════════════════════════ */
+.fp-wrap{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);}
+@media(max-width:900px){.fp-wrap{grid-template-columns:1fr;}}
+
+.fp-card{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:20px;box-shadow:var(--sh);
+}
+.fp-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;}
+.fp-title{font-size:13px;font-weight:700;}
+.fp-canvas-wrap{
+  position:relative;border-radius:var(--r);overflow:hidden;
+  background:var(--s2);border:1px solid var(--border);
+}
+.fp-canvas-wrap canvas{display:block;width:100%;height:auto;}
+.fp-legend{
+  display:flex;align-items:center;gap:8px;margin-top:10px;
+  font-size:10px;color:var(--t2);font-family:var(--mono);
+}
+.fp-grad{
+  height:8px;flex:1;border-radius:999px;
+  background:linear-gradient(90deg,#4a90ff,#00e5a0,#ffd93d,#ff8c42,#ff4d6d);
+}
+.fp-tabs{display:flex;gap:5px;}
+.fpt{
+  padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;
+  border:1px solid var(--border);background:transparent;
+  color:var(--t2);cursor:pointer;font-family:var(--font);transition:all .2s;
+}
+.fpt.active{background:var(--a1g);border-color:var(--a1);color:var(--a1);}
+
+/* ════════════════════════════════════════════════
+   VOTE SECTION
+════════════════════════════════════════════════ */
+.vote-layout{display:grid;grid-template-columns:400px 1fr;gap:var(--gap);}
+@media(max-width:900px){.vote-layout{grid-template-columns:1fr;}}
+
+.vote-form{padding:22px;}
+
+.hall-sel{
+  display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:18px;
+}
+.hs{
+  padding:11px;border-radius:var(--r);border:1px solid var(--border);
+  background:transparent;color:var(--t2);font-family:var(--font);
+  font-size:12px;font-weight:600;cursor:pointer;text-align:center;
+  transition:all .2s;line-height:1.3;
+}
+.hs.active{
+  background:var(--a1g);border-color:var(--a1);color:var(--a1);
+}
+.fm-grp{margin-bottom:14px;}
+.fm-lbl{
+  display:block;font-size:11px;font-weight:700;
+  color:var(--t2);margin-bottom:6px;letter-spacing:.02em;
+}
+.im-tabs{display:flex;gap:5px;margin-bottom:10px;}
+.imt{
+  flex:1;padding:8px;border-radius:8px;
+  font-size:11px;font-weight:600;text-align:center;
+  cursor:pointer;border:1px solid var(--border);
+  background:transparent;color:var(--t2);font-family:var(--font);
+  transition:all .2s;
+}
+.imt.active{background:var(--a1g);border-color:var(--a1);color:var(--a1);}
+.finput{
+  width:100%;padding:10px 13px;
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:var(--r-sm);color:var(--t1);font-family:var(--font);
+  font-size:13px;outline:none;transition:border-color .2s;
+}
+.finput:focus{border-color:var(--a1);}
+.fslider{
+  width:100%;-webkit-appearance:none;height:5px;
+  border-radius:999px;background:var(--border);
+  outline:none;cursor:pointer;
+}
+.fslider::-webkit-slider-thumb{
+  -webkit-appearance:none;width:20px;height:20px;
+  border-radius:50%;background:var(--a1);
+  box-shadow:0 0 8px var(--a1);cursor:pointer;
+  transition:transform .15s;
+}
+.fslider::-webkit-slider-thumb:active{transform:scale(1.3);}
+.temp-disp{
+  display:flex;justify-content:space-between;align-items:flex-end;
+  margin-bottom:8px;
+}
+.td-big{font-size:30px;font-weight:900;color:var(--a1);transition:color .3s;}
+.td-feel{font-size:10px;color:var(--t2);font-family:var(--mono);padding-bottom:4px;}
+.sbtn{
+  width:100%;padding:12px;border-radius:var(--r-sm);
+  border:none;background:var(--a1);color:#fff;
+  font-family:var(--font);font-size:13px;font-weight:700;
+  cursor:pointer;transition:all .2s;
+  box-shadow:0 4px 20px rgba(45,156,255,.3);
+}
+.sbtn:hover{transform:translateY(-1px);}
+.sbtn:disabled{background:var(--t3);box-shadow:none;cursor:not-allowed;transform:none;}
+.vote-ok{
+  margin-top:10px;padding:12px;text-align:center;
+  background:var(--a2g);border:1px solid rgba(0,240,160,.2);
+  border-radius:var(--r-sm);font-size:12px;color:var(--a2);
+  display:none;
+}
+.vote-cd{
+  margin-top:10px;padding:10px;text-align:center;
+  background:rgba(255,211,61,.06);border:1px solid rgba(255,211,61,.15);
+  border-radius:var(--r-sm);font-size:11px;color:#ffd93d;
+  font-family:var(--mono);display:none;
+}
+.ban-card{
+  padding:16px;margin-bottom:16px;
+  background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.2);
+  border-radius:var(--r);font-size:13px;color:var(--a3);
+  display:none;
+}
+.warn-box{
+  margin-top:12px;padding:10px 12px;
+  background:rgba(255,107,107,.05);border:1px solid rgba(255,107,107,.12);
+  border-radius:var(--r-sm);font-size:11px;color:var(--a3);
+  line-height:1.5;
+}
+
+/* Theatre map */
+.tmap{
+  position:relative;border-radius:var(--r);overflow:hidden;
+  background:var(--s2);border:1px solid var(--border);
+  cursor:crosshair;min-height:240px;
+}
+.tmap svg{display:block;width:100%;height:auto;}
+.pin{
+  position:absolute;width:22px;height:22px;
+  border-radius:50%;background:var(--a3);
+  border:3px solid #fff;
+  box-shadow:0 0 0 2px var(--a3),0 4px 12px rgba(0,0,0,.4);
+  transform:translate(-50%,-50%);pointer-events:none;z-index:10;
+  animation:pinDrop .3s var(--ease);
+}
+@keyframes pinDrop{from{transform:translate(-50%,-80%);opacity:0;}to{transform:translate(-50%,-50%);opacity:1;}}
+.map-hint{font-size:10px;color:var(--t3);font-family:var(--mono);text-align:center;margin-top:6px;}
+
+/* Vote Results */
+.vr-card{padding:22px;}
+.vr-title{font-size:14px;font-weight:700;margin-bottom:16px;}
+.vr-hall{margin-bottom:18px;}
+.vr-hn{font-size:11px;font-weight:700;color:var(--t2);font-family:var(--mono);margin-bottom:10px;}
+.vr-total{font-size:10px;color:var(--t3);font-family:var(--mono);margin-bottom:8px;}
+.vbr{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.vbt{font-family:var(--mono);font-size:11px;font-weight:600;width:36px;flex-shrink:0;}
+.vbb{flex:1;height:7px;background:var(--border);border-radius:999px;overflow:hidden;}
+.vbf{height:100%;border-radius:999px;background:var(--a1);transition:width .8s var(--ease);}
+.vbc{font-size:10px;color:var(--t2);font-family:var(--mono);width:22px;text-align:right;flex-shrink:0;}
+
+/* ════════════════════════════════════════════════
+   TOAST
+════════════════════════════════════════════════ */
+.toast-c{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+.toast{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r);padding:11px 15px;
+  font-size:12px;box-shadow:var(--sh2);
+  animation:tIn .3s var(--ease);
+  max-width:300px;display:flex;align-items:center;gap:8px;
+}
+@keyframes tIn{from{opacity:0;transform:translateX(40px);}to{opacity:1;transform:translateX(0);}}
+
+/* Countdown bar */
+.cd-bar{height:2px;background:var(--border);border-radius:999px;overflow:hidden;margin-top:10px;}
+.cd-f{height:100%;background:var(--a1);border-radius:999px;transition:width 1s linear;}
+
+/* Animations */
+.fade-up{animation:fu .5s var(--ease) both;}
+@keyframes fu{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+
+canvas{width:100%!important;}
+</style>
+</head>
+<body>
+
+<!-- ════ NAV ════ -->
+<nav class="nav">
+  <div class="nav-logo">
+    <div class="nav-logo-mark">🌡</div>
+    <span>ThermoSense</span>
+    <span class="nav-badge">V3</span>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="navTo('live',this)">Live</button>
+    <button class="nav-tab" onclick="navTo('history',this)">History</button>
+    <button class="nav-tab" onclick="navTo('trends',this)">Trends</button>
+    <button class="nav-tab" onclick="navTo('ai',this)">AI Insights</button>
+    <button class="nav-tab" onclick="navTo('heatmap',this)">Heatmap</button>
+    <button class="nav-tab" onclick="navTo('vote',this)">Vote</button>
+  </div>
+  <div class="nav-r">
+    <div class="live-pill"><div class="live-d"></div>LIVE</div>
+    <div class="theme-btn" onclick="toggleTheme()"></div>
+  </div>
+</nav>
+
+<!-- ════ PAGE ════ -->
+<main class="page">
+
+  <!-- ── LIVE ── -->
+  <section class="sec fade-up" id="live">
+    <div class="sec-hd">
+      <div>
+        <div class="sec-title">Live Climate — Dual Sensor</div>
+        <div class="sec-sub">J5A · J5B · AVERAGE · 30-SECOND REFRESH</div>
+      </div>
+      <button onclick="fetchAll()" id="refreshBtn"
+        style="padding:7px 16px;border-radius:8px;border:1px solid var(--border);background:var(--a1g);color:var(--a1);font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;">
+        ↻ Refresh
+      </button>
+    </div>
+
+    <!-- Sensor cards -->
+    <div class="sensor-grid" style="margin-bottom:var(--gap)">
+
+      <!-- J5A -->
+      <div class="sensor-card" id="cardA">
+        <div class="sc-accent" style="background:linear-gradient(90deg,var(--a1),var(--a6))"></div>
+        <div class="sc-glow" style="background:var(--a1)"></div>
+        <div class="sc-id" style="background:var(--a1g);border:1px solid rgba(45,156,255,.2);color:var(--a1)">
+          <span>●</span> J5A — Grand Hall
+        </div>
+        <div class="sc-temp" id="a1Temp" style="color:var(--a1)">--°C</div>
+        <div class="sc-humi" id="a1Humi" style="color:var(--a6)">-- %</div>
+        <div class="sc-status" id="a1Status"
+          style="background:var(--a1g);border:1px solid rgba(45,156,255,.2);color:var(--a1)">
+          🌡️ LOADING
+        </div>
+        <div class="sc-loc">Lee Shau Kee Lecture Centre</div>
+        <div class="sc-time" id="a1Time">—</div>
+        <div class="cd-bar"><div class="cd-f" id="cdA" style="width:100%"></div></div>
+      </div>
+
+      <!-- J5B -->
+      <div class="sensor-card" id="cardB">
+        <div class="sc-accent" style="background:linear-gradient(90deg,var(--a2),var(--a6))"></div>
+        <div class="sc-glow" style="background:var(--a2)"></div>
+        <div class="sc-id" style="background:var(--a2g);border:1px solid rgba(0,240,160,.2);color:var(--a2)">
+          <span>●</span> J5B — Yuet Ming
+        </div>
+        <div class="sc-temp" id="b1Temp" style="color:var(--a2)">--°C</div>
+        <div class="sc-humi" id="b1Humi" style="color:var(--a6)">-- %</div>
+        <div class="sc-status" id="b1Status"
+          style="background:var(--a2g);border:1px solid rgba(0,240,160,.2);color:var(--a2)">
+          🌡️ LOADING
+        </div>
+        <div class="sc-loc">Yuet Ming Auditorium</div>
+        <div class="sc-time" id="b1Time">—</div>
+        <div class="cd-bar"><div class="cd-f" id="cdB" style="width:100%"></div></div>
+      </div>
+
+      <!-- AVG -->
+      <div class="avg-card">
+        <div>
+          <div class="lbl">CAMPUS AVERAGE</div>
+          <div class="avg-title">Combined Reading</div>
+          <div class="avg-sub">J5A + J5B mean values</div>
+          <div class="avg-temp" id="avgTemp">--°C</div>
+        </div>
+        <div class="avg-row">
+          <div class="avg-mini">
+            <div class="avg-mini-val" id="avgHumi" style="color:var(--a6)">--%</div>
+            <div class="avg-mini-lbl">AVG HUMIDITY</div>
+          </div>
+          <div class="avg-mini">
+            <div class="avg-mini-val" id="avgDelta" style="color:var(--a4)">Δ --</div>
+            <div class="avg-mini-lbl">SENSOR DELTA</div>
+          </div>
+          <div class="avg-mini">
+            <div class="avg-mini-val" id="avgStatus" style="color:var(--a2)">--</div>
+            <div class="avg-mini-lbl">OVERALL</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats row -->
+    <div class="g4">
+      <div class="card stat-mini">
+        <div class="icon">❄️</div>
+        <div class="val" id="sMin" style="color:var(--a6)">--°</div>
+        <div class="lbl2">Min Today</div>
+      </div>
+      <div class="card stat-mini">
+        <div class="icon">🔥</div>
+        <div class="val" id="sMax" style="color:var(--a4)">--°</div>
+        <div class="lbl2">Max Today</div>
+      </div>
+      <div class="card stat-mini">
+        <div class="icon">💧</div>
+        <div class="val" id="sHumi" style="color:var(--a1)">--%</div>
+        <div class="lbl2">Avg Humidity</div>
+      </div>
+      <div class="card stat-mini">
+        <div class="icon">📡</div>
+        <div class="val" id="sCount" style="color:var(--a2)">--</div>
+        <div class="lbl2">Total Readings</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── HISTORY ── -->
+  <section class="sec fade-up" id="history">
+    <div class="sec-hd">
+      <div>
+        <div class="sec-title">Temperature History</div>
+        <div class="sec-sub">10-MIN SAMPLES · AVERAGE + BOTH SENSORS</div>
+      </div>
+      <div class="range-tabs">
+        <button class="rtab active" onclick="setRange(1,this)">1H</button>
+        <button class="rtab" onclick="setRange(2,this)">2H</button>
+        <button class="rtab" onclick="setRange(5,this)">5H</button>
+      </div>
+    </div>
+    <div class="card p20">
+      <div class="chart-hd">
+        <div class="chart-title">Instantaneous Temperature Over Time</div>
+        <div class="legend">
+          <div class="leg"><div class="leg-d" style="background:var(--a1)"></div>J5A Grand Hall</div>
+          <div class="leg"><div class="leg-d" style="background:var(--a2)"></div>J5B Yuet Ming</div>
+          <div class="leg"><div class="leg-d" style="background:var(--a5)"></div>Average</div>
+        </div>
+      </div>
+      <canvas id="histChart" height="220"></canvas>
+    </div>
+  </section>
+
+  <!-- ── TRENDS ── -->
+  <section class="sec fade-up" id="trends">
+    <div class="sec-hd">
+      <div>
+        <div class="sec-title">Weekly Trends</div>
+        <div class="sec-sub">MORNING · AFTERNOON · EVENING AVERAGES</div>
+      </div>
+    </div>
+    <div class="week-grid" id="weekGrid"></div>
+    <div class="card p20">
+      <canvas id="trendChart" height="200"></canvas>
+    </div>
+  </section>
+
+  <!-- ── AI ── -->
+  <section class="sec fade-up" id="ai">
+    <div class="sec-hd">
+      <div>
+        <div class="sec-title">🤖 AI Climate Insights</div>
+        <div class="sec-sub">PATTERN-BASED PREDICTIONS PER HALL</div>
+      </div>
+    </div>
+    <div class="ai-wrap">
+      <div>
+        <div class="ai-hall-tabs">
+          <button class="aht active" onclick="setAiHall('grand',this)">Grand Hall</button>
+          <button class="aht" onclick="setAiHall('yuet',this)">Yuet Ming</button>
+        </div>
+        <div class="ai-card" id="aiCard"></div>
+      </div>
+      <div class="card p20">
+        <div class="lbl">24-HOUR PREDICTION CURVE</div>
+        <canvas id="aiChart" height="220"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── HEATMAP ── -->
+  <section class="sec fade-up" id="heatmap">
+    <div class="sec-hd">
+      <div>
+        <div class="sec-title">🗺️ Floor Plan Heatmap</div>
+        <div class="sec-sub">TEMPERATURE + VOTE OVERLAY ON SEATING PLAN</div>
+      </div>
+      <div class="fp-tabs">
+        <button class="fpt active" onclick="setFpHall('grand',this)">Grand Hall</button>
+        <button class="fpt" onclick="setFpHall('yuet',this)">Yuet Ming</button>
+      </div>
+    </div>
+    <div class="fp-wrap">
+      <div class="fp-card">
+        <div class="fp-hd">
+          <div class="fp-title" id="fpTitle">Grand Hall — Temperature Heatmap</div>
+          <div style="display:flex;gap:6px;">
+            <button class="fpt active" id="hmTempBtn" onclick="setHmLayer('temp',this)">Temp</button>
+            <button class="fpt" id="hmVoteBtn" onclick="setHmLayer('votes',this)">Votes</button>
+            <button class="fpt" id="hmBothBtn" onclick="setHmLayer('both',this)">Both</button>
+          </div>
+        </div>
+        <div class="fp-canvas-wrap">
+          <canvas id="heatmapCanvas"></canvas>
+        </div>
+        <div class="fp-legend">
+          <span>Cold</span>
+          <div class="fp-grad"></div>
+          <span>Hot</span>
+        </div>
+        <div style="font-size:10px;color:var(--t3);font-family:var(--mono);margin-top:6px;">
+          ● = Temperature zones &nbsp;|&nbsp; ★ = Student vote location
+        </div>
+      </div>
+      <div class="fp-card">
+        <div class="fp-hd">
+          <div class="fp-title">Comfort Distribution</div>
+        </div>
+        <canvas id="distChart" height="200"></canvas>
+        <div class="div"></div>
+        <div class="lbl">VOTE TEMPERATURE PREFERENCES</div>
+        <canvas id="voteDistChart" height="160"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── VOTE ── -->
+  <section class="sec fade-up" id="vote">
+    <div class="sec-hd">
+      <div>
+        <div class="sec-title">🗳️ Student Comfort Vote</div>
+        <div class="sec-sub">SELECT YOUR HALL · MARK YOUR SEAT · VOTE YOUR TEMP</div>
+      </div>
+    </div>
+
+    <div class="ban-card" id="banCard">
+      ⛔ <strong>Access Suspended</strong> — Multiple rapid submissions detected.<br>
+      <span style="font-size:11px;opacity:.8">Your ban expires: <span id="banExpiry">—</span></span>
+    </div>
+
+    <div class="vote-layout" id="voteLayout">
+
+      <!-- Form -->
+      <div class="card vote-form">
+        <div class="lbl" style="margin-bottom:10px">1. Choose Your Hall</div>
+        <div class="hall-sel">
+          <button class="hs active" onclick="pickHall('grand',this)">
+            🏛️ Grand Hall<br>
+            <span style="font-size:10px;opacity:.7">Lee Shau Kee · 834 seats</span>
+          </button>
+          <button class="hs" onclick="pickHall('yuet',this)">
+            🎭 Yuet Ming<br>
+            <span style="font-size:10px;opacity:.7">Auditorium · ~300 seats</span>
+          </button>
+        </div>
+
+        <div class="lbl" style="margin-bottom:10px">2. Mark Your Seat</div>
+        <div class="fm-grp">
+          <div class="im-tabs">
+            <button class="imt active" onclick="pickIM('type',this)">⌨️ Type Seat</button>
+            <button class="imt" onclick="pickIM('map',this)">📍 Map Pin</button>
+          </div>
+        </div>
+
+        <div class="fm-grp" id="typeGrp">
+          <label class="fm-lbl">Seat Number (e.g. G12 or Row G Seat 12)</label>
+          <input type="text" class="finput" id="seatIn" placeholder="Enter your seat number...">
+        </div>
+
+        <div id="mapGrp" style="display:none">
+          <label class="fm-lbl">Tap the floor plan to drop your pin</label>
+          <div class="tmap" id="voteMap" onclick="dropPin(event)"></div>
+          <div class="map-hint" id="pinHint">Tap anywhere to place your pin</div>
+        </div>
+
+        <div class="div"></div>
+        <div class="lbl" style="margin-bottom:10px">3. Your Preferred Temperature</div>
+        <div class="fm-grp">
+          <div class="temp-disp">
+            <span class="td-big" id="vtempDisp">22°C</span>
+            <span class="td-feel" id="vtempFeel">COMFORTABLE</span>
+          </div>
+          <input type="range" class="fslider" id="vtempSlider"
+            min="16" max="28" step="1" value="22"
+            oninput="updateVSlider(this.value)">
+          <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--t3);font-family:var(--mono);margin-top:4px;">
+            <span>16°C</span><span>19°C</span><span>22°C</span><span>25°C</span><span>28°C</span>
+          </div>
+        </div>
+
+        <button class="sbtn" id="voteBtn" onclick="submitVote()">Submit Vote</button>
+        <div class="vote-ok" id="voteOk">✅ Vote recorded! You can vote again in 20 minutes.</div>
+        <div class="vote-cd" id="voteCd"></div>
+        <div class="warn-box">
+          ⚠️ <strong>Warning:</strong> Multiple votes within 20 minutes will result in a
+          <strong>30-day ban</strong> from this platform.
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div class="card vr-card">
+        <div class="vr-title">Live Results</div>
+        <div id="voteResults"></div>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<div class="toast-c" id="toastC"></div>
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   CONFIG
+══════════════════════════════════════════════════════════ */
+const C = {
+  J5A_CH:  "3337930",
+  J5A_KEY: "XVAME7ZOB25RCC9Y",
+  J5B_CH:  "3295527",
+  J5B_KEY: "LKUBIZA1VD9S9V6S",
+  GS:      "https://script.google.com/macros/s/AKfycbyWNwx0wlUxSJzmGD_PdCYFJ4hQPzrWQmf_NQoTfr7rIK_nAaXF2HSAV9yYDSTbVZObVw/exec",
+  COOLDOWN: 20*60*1000,
+  BAN_DUR:  30*24*60*60*1000,
+  MAX_TRIES:3,
+  REFRESH:  30000,
+};
+
+const LS = { BAN:'hku3_ban',VOTE_T:'hku3_vote',TRIES:'hku3_tries',WIN:'hku3_win',UID:'hku3_uid' };
+
+/* ══════════════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════════════ */
+let S = {
+  a: { temp:null, humi:null, status:null, ts:null },
+  b: { temp:null, humi:null, status:null, ts:null },
+  histA: [], histB: [],
+  histRange: 1,
+  votes: { grand:{}, yuet:{} },
+  selHall: 'grand',
+  inputMethod: 'type',
+  markerPos: null,
+  aiHall: 'grand',
+  fpHall: 'grand',
+  hmLayer: 'temp',
+  cdInterval: null,
+  cdSecs: 30,
+};
+
+// Charts
+let charts = {};
+
+/* ══════════════════════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════════════════════ */
+function uid() {
+  let u = localStorage.getItem(LS.UID);
+  if (!u) { u = 'u'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); localStorage.setItem(LS.UID,u); }
+  return u;
+}
+
+function isDark() { return document.documentElement.getAttribute('data-theme')==='dark'; }
+
+function navTo(id, btn) {
+  document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'});
+  document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
+  btn?.classList.add('active');
+}
+
+function toggleTheme() {
+  const h = document.documentElement;
+  h.setAttribute('data-theme', isDark()?'light':'dark');
+  setTimeout(rebuildAllCharts, 50);
+}
+
+function toast(msg, type='info', dur=3500) {
+  const c={'info':C.J5A_CH,'success':'#00f0a0','warning':'#ffd93d','error':'#ff6b6b'};
+  const ic={'info':'ℹ️','success':'✅','warning':'⚠️','error':'❌'};
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.style.borderLeft = `3px solid ${c[type]||'var(--a1)'}`;
+  el.innerHTML = `<span>${ic[type]||'ℹ️'}</span><span>${msg}</span>`;
+  document.getElementById('toastC').appendChild(el);
+  setTimeout(()=>el.remove(), dur);
+}
+
+function tsUrl(ch, key, n=1) {
+  return `https://api.thingspeak.com/channels/${ch}/feeds.json?results=${n}${key?'&api_key='+key:''}`;
+}
+
+function statusMeta(t, h) {
+  if (!t) return {text:'LOADING',icon:'🌡️',color:'var(--a1)',bg:'var(--a1g)',bd:'rgba(45,156,255,.2)'};
+  if (t>=22&&t<=26&&h>=40&&h<=60) return {text:'COMFORTABLE',icon:'✅',color:'var(--a2)',bg:'var(--a2g)',bd:'rgba(0,240,160,.2)'};
+  if (t<22&&h>60) return {text:'COLD & HUMID',icon:'🥶💧',color:'var(--a3)',bg:'var(--a3g)',bd:'rgba(255,107,107,.2)'};
+  if (t>26&&h>60) return {text:'HOT & HUMID',icon:'🥵💧',color:'var(--a4)',bg:'rgba(255,169,77,.1)',bd:'rgba(255,169,77,.2)'};
+  if (t<22) return {text:'TOO COLD',icon:'🥶',color:'var(--a6)',bg:'rgba(56,189,248,.1)',bd:'rgba(56,189,248,.2)'};
+  if (t>26) return {text:'TOO HOT',icon:'🥵',color:'var(--a4)',bg:'rgba(255,169,77,.1)',bd:'rgba(255,169,77,.2)'};
+  if (h>60) return {text:'HUMID HIGH',icon:'💧',color:'#ffd93d',bg:'rgba(255,217,61,.08)',bd:'rgba(255,217,61,.2)'};
+  return {text:'HUMID LOW',icon:'🏜️',color:'var(--a5)',bg:'var(--a5g)',bd:'rgba(192,132,252,.2)'};
+}
+
+function deriveStatus(t,h){
+  if(t>=22&&t<=26&&h>=40&&h<=60)return'COMFORTABLE';
+  if(t<22&&h>60)return'COLD & HUMID';
+  if(t>26&&h>60)return'HOT & HUMID';
+  if(t<22)return'TOO COLD';
+  if(t>26)return'TOO HOT';
+  if(h>60)return'HUMID HIGH';
+  return'HUMID LOW';
+}
+
+/* ══════════════════════════════════════════════════════════
+   FETCH
+══════════════════════════════════════════════════════════ */
+async function fetchSensor(ch, key, n=1) {
+  const r = await fetch(tsUrl(ch, key, n));
+  const d = await r.json();
+  return d.feeds || [];
+}
+
+async function fetchAll() {
+  const btn = document.getElementById('refreshBtn');
+  btn.textContent = '↻ Fetching...'; btn.disabled = true;
+  try {
+    // Fetch latest from both
+    const [fa, fb] = await Promise.all([
+      fetchSensor(C.J5A_CH, C.J5A_KEY, 1),
+      fetchSensor(C.J5B_CH, C.J5B_KEY, 1),
+    ]);
+
+    if (fa.length) {
+      const f = fa[0];
+      S.a.temp = parseFloat(f.field1);
+      S.a.humi = parseFloat(f.field2);
+      S.a.status = f.field3 || deriveStatus(S.a.temp, S.a.humi);
+      S.a.ts = f.created_at;
+      addHist(S.histA, S.a.temp, S.a.humi, f.created_at);
+    }
+    if (fb.length) {
+      const f = fb[0];
+      S.b.temp = parseFloat(f.field1);
+      S.b.humi = parseFloat(f.field2);
+      S.b.status = f.field3 || deriveStatus(S.b.temp, S.b.humi);
+      S.b.ts = f.created_at;
+      addHist(S.histB, S.b.temp, S.b.humi, f.created_at);
+    }
+
+    updateSensorCards();
+    updateStats();
+    rebuildHistChart();
+    rebuildHeatmap();
+    resetCd();
+
+  } catch(e) {
+    toast('Fetch failed — check connection','error');
+  }
+  btn.textContent = '↻ Refresh'; btn.disabled = false;
+}
+
+function addHist(arr, temp, humi, ts) {
+  const now = new Date(ts || Date.now());
+  const cutoff = new Date(Date.now() - 5*60*60*1000);
+  // Trim old
+  while (arr.length && new Date(arr[0].ts) < cutoff) arr.shift();
+  // Add if 10+ mins from last
+  if (!arr.length || now - new Date(arr[arr.length-1].ts) >= 9*60*1000) {
+    arr.push({ ts: now.toISOString(), temp, humi });
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   SENSOR CARD UI
+══════════════════════════════════════════════════════════ */
+function updateSensorCards() {
+  // J5A
+  if (S.a.temp !== null) {
+    document.getElementById('a1Temp').textContent = S.a.temp.toFixed(1)+'°C';
+    document.getElementById('a1Humi').textContent = S.a.humi.toFixed(1)+'%';
+    const m = statusMeta(S.a.temp, S.a.humi);
+    const st = document.getElementById('a1Status');
+    st.style.background=m.bg; st.style.borderColor=m.bd; st.style.color=m.color;
+    st.innerHTML = m.icon+' '+m.text;
+    document.getElementById('a1Time').textContent =
+      S.a.ts ? 'Updated: '+new Date(S.a.ts).toLocaleTimeString() : '—';
+  }
+  // J5B
+  if (S.b.temp !== null) {
+    document.getElementById('b1Temp').textContent = S.b.temp.toFixed(1)+'°C';
+    document.getElementById('b1Humi').textContent = S.b.humi.toFixed(1)+'%';
+    const m = statusMeta(S.b.temp, S.b.humi);
+    const st = document.getElementById('b1Status');
+    st.style.background=m.bg; st.style.borderColor=m.bd; st.style.color=m.color;
+    st.innerHTML = m.icon+' '+m.text;
+    document.getElementById('b1Time').textContent =
+      S.b.ts ? 'Updated: '+new Date(S.b.ts).toLocaleTimeString() : '—';
+  }
+  // Average
+  if (S.a.temp && S.b.temp) {
+    const avg = ((S.a.temp + S.b.temp)/2).toFixed(1);
+    const avgH = ((S.a.humi + S.b.humi)/2).toFixed(0);
+    const delta = Math.abs(S.a.temp - S.b.temp).toFixed(1);
+    document.getElementById('avgTemp').textContent = avg+'°C';
+    document.getElementById('avgHumi').textContent = avgH+'%';
+    document.getElementById('avgDelta').textContent = 'Δ '+delta+'°';
+    const m = statusMeta(parseFloat(avg), parseFloat(avgH));
+    document.getElementById('avgStatus').textContent = m.text;
+    document.getElementById('avgStatus').style.color = m.color;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   STATS
+══════════════════════════════════════════════════════════ */
+function updateStats() {
+  const all = [...S.histA, ...S.histB];
+  if (!all.length) return;
+  const temps = all.map(x=>x.temp).filter(Boolean);
+  const humis = all.map(x=>x.humi).filter(Boolean);
+  document.getElementById('sMin').textContent = Math.min(...temps).toFixed(1)+'°';
+  document.getElementById('sMax').textContent = Math.max(...temps).toFixed(1)+'°';
+  document.getElementById('sHumi').textContent = (humis.reduce((a,b)=>a+b,0)/humis.length).toFixed(0)+'%';
+  document.getElementById('sCount').textContent = all.length;
+}
+
+/* ══════════════════════════════════════════════════════════
+   HISTORY CHART
+══════════════════════════════════════════════════════════ */
+function setRange(h, btn) {
+  S.histRange = h;
+  document.querySelectorAll('.rtab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  rebuildHistChart();
+}
+
+function fakeHist(hrs, baseTemp, variation) {
+  const now = new Date();
+  const pts = hrs * 6;
+  return Array.from({length:pts},(_,i) => {
+    const t = new Date(now.getTime() - (pts-1-i)*10*60*1000);
+    const hr = t.getHours();
+    const base = hr<8?21:hr<12?23:hr<17?25.5:hr<20?24:22;
+    return { ts: t.toISOString(), temp: parseFloat((baseTemp+(base-22)*0.5+(Math.random()-.5)*variation).toFixed(1)), humi: parseFloat((68+(Math.random()-.5)*8).toFixed(1)) };
+  });
+}
+
+function rebuildHistChart() {
+  const cutoff = new Date(Date.now() - S.histRange*60*60*1000);
+  let dA = S.histA.filter(x=>new Date(x.ts)>cutoff);
+  let dB = S.histB.filter(x=>new Date(x.ts)>cutoff);
+  if (dA.length < 3) dA = fakeHist(S.histRange, 24.5, 1.2);
+  if (dB.length < 3) dB = fakeHist(S.histRange, 23.8, 1.4);
+
+  // Merge timestamps (use longer array as labels)
+  const base = dA.length >= dB.length ? dA : dB;
+  const labels = base.map(x=>{
+    const d=new Date(x.ts);
+    return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');
+  });
+
+  const ctx = document.getElementById('histChart').getContext('2d');
+  if (charts.hist) charts.hist.destroy();
+  const dk = isDark();
+  const grid = dk?'rgba(255,255,255,.04)':'rgba(0,0,0,.04)';
+  const tick = dk?'#2d4260':'#99afc8';
+
+  const aTemps = dA.map(x=>x.temp);
+  const bTemps = dB.map(x=>x.temp);
+  const minLen = Math.min(aTemps.length, bTemps.length);
+  const avgTemps = Array.from({length:minLen},(_,i)=>parseFloat(((aTemps[i]+bTemps[i])/2).toFixed(1)));
+
+  charts.hist = new Chart(ctx, {
+    type:'line',
+    data:{
+      labels,
+      datasets:[
+        { label:'J5A Grand Hall', data:aTemps, borderColor:'#2d9cff', backgroundColor:'rgba(45,156,255,0.07)', borderWidth:2.5, pointRadius:3, pointBackgroundColor:'#2d9cff', tension:0.4, fill:true, yAxisID:'y' },
+        { label:'J5B Yuet Ming', data:bTemps, borderColor:'#00f0a0', backgroundColor:'rgba(0,240,160,0.06)', borderWidth:2.5, pointRadius:3, pointBackgroundColor:'#00f0a0', tension:0.4, fill:true, yAxisID:'y' },
+        { label:'Average', data:avgTemps, borderColor:'#c084fc', backgroundColor:'rgba(192,132,252,0.05)', borderWidth:2, borderDash:[6,3], pointRadius:2, pointBackgroundColor:'#c084fc', tension:0.4, fill:false, yAxisID:'y' },
+      ]
+    },
+    options:{
+      responsive:true,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{labels:{color:tick,font:{family:'JetBrains Mono',size:11},boxWidth:8}},
+        tooltip:{backgroundColor:dk?'#0c1524':'#fff',titleColor:dk?'#dde8f8':'#0c1524',bodyColor:tick,borderColor:dk?'rgba(255,255,255,.06)':'rgba(0,0,0,.06)',borderWidth:1,padding:10}
+      },
+      scales:{
+        x:{ticks:{color:tick,font:{family:'JetBrains Mono',size:9},maxTicksLimit:8},grid:{color:grid}},
+        y:{ticks:{color:'#2d9cff',font:{family:'JetBrains Mono',size:9}},grid:{color:grid}},
+      }
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════════════
+   WEEKLY TRENDS
+══════════════════════════════════════════════════════════ */
+const DAYS = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
+const TREND_DATA = DAYS.map((d,i)=>({
+  day:d,
+  am:  parseFloat((20.5+Math.sin(i*.8)*1.5+Math.random()*.8).toFixed(1)),
+  pm:  parseFloat((25.0+Math.sin(i*.6)*2.0+Math.random()*1.0).toFixed(1)),
+  eve: parseFloat((23.0+Math.sin(i*.4)*1.2+Math.random()*.6).toFixed(1)),
+}));
+
+function buildWeekGrid() {
+  document.getElementById('weekGrid').innerHTML = TREND_DATA.map(d=>`
+    <div class="day-card">
+      <div class="day-nm">${d.day}</div>
+      <div class="period">
+        <div class="pi"><span class="pl">🌅 AM</span><span class="pv" style="color:var(--a6)">${d.am}°</span></div>
+        <div class="pi"><span class="pl">☀️ PM</span><span class="pv" style="color:var(--a4)">${d.pm}°</span></div>
+        <div class="pi"><span class="pl">🌙 EVE</span><span class="pv" style="color:var(--a5)">${d.eve}°</span></div>
+      </div>
+    </div>`).join('');
+}
+
+function buildTrendChart() {
+  const dk=isDark(); const tick=dk?'#2d4260':'#99afc8'; const grid=dk?'rgba(255,255,255,.04)':'rgba(0,0,0,.04)';
+  const ctx = document.getElementById('trendChart').getContext('2d');
+  if (charts.trend) charts.trend.destroy();
+  charts.trend = new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:DAYS,
+      datasets:[
+        {label:'Morning',data:TREND_DATA.map(d=>d.am),backgroundColor:'rgba(56,189,248,.65)',borderRadius:4},
+        {label:'Afternoon',data:TREND_DATA.map(d=>d.pm),backgroundColor:'rgba(255,169,77,.65)',borderRadius:4},
+        {label:'Evening',data:TREND_DATA.map(d=>d.eve),backgroundColor:'rgba(192,132,252,.65)',borderRadius:4},
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{color:tick,font:{family:'JetBrains Mono',size:11},boxWidth:8}},tooltip:{backgroundColor:dk?'#0c1524':'#fff',titleColor:dk?'#dde8f8':'#0c1524',bodyColor:tick,borderColor:dk?'rgba(255,255,255,.06)':'rgba(0,0,0,.06)',borderWidth:1}},
+      scales:{x:{ticks:{color:tick,font:{family:'JetBrains Mono',size:9}},grid:{color:grid}},y:{ticks:{color:tick,font:{family:'JetBrains Mono',size:9}},grid:{color:grid}}}
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════════════
+   AI INSIGHTS
+══════════════════════════════════════════════════════════ */
+const AI = {
+  grand:{
+    name:'Grand Hall, Lee Shau Kee',
+    preds:[20.5,21.0,21.5,22.0,23.5,25.0,26.2,26.8,27.0,26.5,25.8,25.0,24.5,24.0,23.8,23.5,23.2,23.0,22.5,22.0,21.8,21.5,21.0,20.8],
+    conf:72,
+    tip:'🧥 Grand Hall is overcooled in early morning lectures. Bring a light jacket — temperature typically drops to 21°C before 9AM.',
+    desc:'Analysis of 834-seat Grand Hall shows solar heat gain peaks at 13:00–15:00, causing AC systems to overcorrect. Morning sessions (8–10AM) consistently record the coldest readings.',
+  },
+  yuet:{
+    name:'Yuet Ming Auditorium',
+    preds:[21.0,21.5,22.0,22.5,23.0,24.5,25.5,26.0,26.5,26.0,25.5,25.0,24.5,24.0,23.5,23.0,22.8,22.5,22.0,21.8,21.5,21.2,21.0,20.8],
+    conf:68,
+    tip:'💧 Yuet Ming has poor ventilation — humidity regularly exceeds 70%. It will feel warmer than actual temperature. Stay hydrated.',
+    desc:'Compact enclosed auditorium design traps humidity. Evening events (after 19:00) with high occupancy see humidity spikes of +10–15%. The AC system struggles during peak occupancy.',
+  }
+};
+
+function setAiHall(h, btn) {
+  S.aiHall=h;
+  document.querySelectorAll('.aht').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAiCard();
+}
+
+function renderAiCard() {
+  const h=S.aiHall; const d=AI[h];
+  const hr=new Date().getHours();
+  const pNow=d.preds[hr]; const p3h=d.preds[(hr+3)%24];
+  document.getElementById('aiCard').innerHTML = `
+    <div class="ai-hd">
+      <div class="ai-icon">🤖</div>
+      <div><div class="ai-name">AI Prediction</div><div class="ai-hall">${d.name}</div></div>
+    </div>
+    <div class="ai-pred-box">
+      <div class="ai-pred-n">PREDICTED NOW</div>
+      <div class="ai-pred-t">${pNow.toFixed(1)}°C</div>
+      <div class="ai-pred-3h">+3 hours: <strong style="color:var(--a6)">${p3h.toFixed(1)}°C</strong></div>
+      <div class="ai-pred-desc">${d.desc}</div>
+    </div>
+    <div class="ai-tip"><span style="font-size:20px;flex-shrink:0">${d.tip[0]}</span><span>${d.tip.slice(2)}</span></div>
+    <div class="ai-conf">
+      <span>Confidence</span>
+      <div class="conf-bg"><div class="conf-f" style="width:${d.conf}%"></div></div>
+      <span>${d.conf}%</span>
+    </div>
+    <div class="ai-sim-note">⚠ Simulated data — improves as sensor history accumulates</div>
+  `;
+  buildAiChart(d.preds, hr);
+}
+
+function buildAiChart(preds, curHr) {
+  const dk=isDark(); const tick=dk?'#2d4260':'#99afc8'; const grid=dk?'rgba(255,255,255,.04)':'rgba(0,0,0,.04)';
+  const ctx = document.getElementById('aiChart').getContext('2d');
+  if (charts.ai) charts.ai.destroy();
+  charts.ai = new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:Array.from({length:24},(_,i)=>i.toString().padStart(2,'0')+':00'),
+      datasets:[{
+        label:'Predicted °C', data:preds,
+        borderColor:'#c084fc', backgroundColor:'rgba(192,132,252,.07)',
+        borderWidth:2, tension:0.4, fill:true,
+        pointRadius:preds.map((_,i)=>i===curHr?8:2),
+        pointBackgroundColor:preds.map((_,i)=>i===curHr?'#ff6b6b':'#c084fc'),
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{display:false},tooltip:{backgroundColor:dk?'#0c1524':'#fff',titleColor:dk?'#dde8f8':'#0c1524',bodyColor:tick,borderColor:dk?'rgba(255,255,255,.06)':'rgba(0,0,0,.06)',borderWidth:1}},
+      scales:{x:{ticks:{color:tick,font:{family:'JetBrains Mono',size:8},maxTicksLimit:8},grid:{color:grid}},y:{ticks:{color:'#c084fc',font:{family:'JetBrains Mono',size:9}},grid:{color:grid}}}
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════════════
+   HEATMAP (Canvas-based)
+══════════════════════════════════════════════════════════ */
+const FP_ZONES = {
+  grand: [
+    {x:.15,y:.25,r:.12,temp:22.5,label:'Stalls Left'},
+    {x:.50,y:.25,r:.14,temp:24.0,label:'Stalls Centre'},
+    {x:.85,y:.25,r:.12,temp:23.2,label:'Stalls Right'},
+    {x:.50,y:.55,r:.15,temp:25.5,label:'Stalls 3'},
+    {x:.25,y:.85,r:.10,temp:26.0,label:'Balcony L'},
+    {x:.50,y:.88,r:.12,temp:25.8,label:'Balcony C'},
+    {x:.75,y:.85,r:.10,temp:25.5,label:'Balcony R'},
+  ],
+  yuet: [
+    {x:.20,y:.35,r:.12,temp:23.5,label:'Left Block'},
+    {x:.50,y:.30,r:.15,temp:24.5,label:'Centre'},
+    {x:.80,y:.35,r:.12,temp:23.8,label:'Right Block'},
+    {x:.50,y:.60,r:.13,temp:25.2,label:'Mid Centre'},
+    {x:.30,y:.65,r:.10,temp:24.0,label:'Mid Left'},
+    {x:.70,y:.65,r:.10,temp:24.2,label:'Mid Right'},
+    {x:.50,y:.85,r:.10,temp:23.0,label:'Front'},
+  ]
+};
+
+function setFpHall(h, btn) {
+  S.fpHall=h;
+  document.querySelectorAll('.fpt').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('fpTitle').textContent =
+    (h==='grand'?'Grand Hall':'Yuet Ming')+' — Temperature Heatmap';
+  rebuildHeatmap();
+}
+
+function setHmLayer(l, btn) {
+  S.hmLayer=l;
+  ['hmTempBtn','hmVoteBtn','hmBothBtn'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  btn.classList.add('active');
+  rebuildHeatmap();
+}
+
+function tempToColor(t, alpha=0.7) {
+  // 20°C = blue → 23°C = green → 26°C = yellow → 28°C = red
+  const cold=[74,144,255], comfort=[0,240,160], warm=[255,217,61], hot=[255,107,107];
+  let r,g,b;
+  if (t<=22){ const f=(t-18)/4; r=lerp(cold[0],comfort[0],f); g=lerp(cold[1],comfort[1],f); b=lerp(cold[2],comfort[2],f); }
+  else if (t<=25){ const f=(t-22)/3; r=lerp(comfort[0],warm[0],f); g=lerp(comfort[1],warm[1],f); b=lerp(comfort[2],warm[2],f); }
+  else { const f=Math.min((t-25)/3,1); r=lerp(warm[0],hot[0],f); g=lerp(warm[1],hot[1],f); b=lerp(warm[2],hot[2],f); }
+  return `rgba(${Math.round(r)},${Math.round(g)},${Math.round(b)},${alpha})`;
+}
+
+function lerp(a,b,f){ return a+(b-a)*f; }
+
+function rebuildHeatmap() {
+  const canvas = document.getElementById('heatmapCanvas');
+  const wrap   = canvas.parentElement;
+  const W = wrap.clientWidth || 400;
+  const H = Math.round(W * 1.2);
+  canvas.width  = W;
+  canvas.height = H;
+  canvas.style.height = H+'px';
+
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+
+  // Background
+  ctx.fillStyle = isDark() ? '#111d2e' : '#f0f4fe';
+  ctx.roundRect(0,0,W,H,12);
+  ctx.fill();
+
+  // Stage
+  const sX=W*.25, sY=H*.04, sW=W*.5, sH=H*.07;
+  ctx.strokeStyle = '#2d9cff';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([6,3]);
+  ctx.roundRect(sX,sY,sW,sH,6);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#2d9cff';
+  ctx.font = `bold ${W*.035}px Epilogue`;
+  ctx.textAlign = 'center';
+  ctx.fillText('STAGE', W*.5, sY+sH*.65);
+
+  const zones = FP_ZONES[S.fpHall];
+
+  // Draw heat zones
+  if (S.hmLayer === 'temp' || S.hmLayer === 'both') {
+    zones.forEach(z => {
+      // Override with live sensor data for the hall sensor
+      const sensorTemp = S.fpHall === 'grand' ? S.a.temp : S.b.temp;
+      const t = sensorTemp ? (z.temp + (sensorTemp - 24) * 0.6) : z.temp;
+      const grd = ctx.createRadialGradient(z.x*W, z.y*H, 0, z.x*W, z.y*H, z.r*W);
+      grd.addColorStop(0, tempToColor(t, 0.75));
+      grd.addColorStop(1, tempToColor(t, 0));
+      ctx.fillStyle = grd;
+      ctx.beginPath();
+      ctx.ellipse(z.x*W, z.y*H, z.r*W, z.r*H*.8, 0, 0, Math.PI*2);
+      ctx.fill();
+
+      // Label
+      ctx.fillStyle = isDark() ? 'rgba(255,255,255,.7)' : 'rgba(0,0,0,.6)';
+      ctx.font = `${W*.022}px JetBrains Mono`;
+      ctx.textAlign = 'center';
+      ctx.fillText(t.toFixed(1)+'°C', z.x*W, z.y*H+5);
+      ctx.font = `${W*.018}px JetBrains Mono`;
+      ctx.fillStyle = isDark() ? 'rgba(255,255,255,.4)' : 'rgba(0,0,0,.35)';
+      ctx.fillText(z.label, z.x*W, z.y*H+W*.025);
+    });
+  }
+
+  // Vote markers
+  if (S.hmLayer === 'votes' || S.hmLayer === 'both') {
+    const hallVotes = S.votes[S.fpHall];
+    Object.entries(hallVotes).forEach(([temp, cnt]) => {
+      // Scatter votes based on seat preference
+      for (let i=0; i<cnt; i++) {
+        const vx = .15 + Math.random() * .7;
+        const vy = .15 + Math.random() * .7;
+        const t  = parseInt(temp);
+        ctx.fillStyle = tempToColor(t, 0.9);
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 1.5;
+        // Star shape
+        drawStar(ctx, vx*W, vy*H, 5, W*.015, W*.007);
+        ctx.fill(); ctx.stroke();
+      }
+    });
+  }
+
+  // Seat grid (dots)
+  ctx.fillStyle = isDark() ? 'rgba(255,255,255,.06)' : 'rgba(0,0,0,.06)';
+  const rows = S.fpHall === 'grand' ? 20 : 16;
+  const cols = S.fpHall === 'grand' ? 18 : 14;
+  for (let r=0; r<rows; r++) {
+    for (let c=0; c<cols; c++) {
+      const sx = (.12 + c/cols*.76)*W;
+      const sy = (.14 + r/rows*.7)*H;
+      ctx.beginPath();
+      ctx.arc(sx,sy,1.5,0,Math.PI*2);
+      ctx.fill();
+    }
+  }
+
+  buildDistChart();
+  buildVoteDistChart();
+}
+
+function drawStar(ctx, cx, cy, spikes, outerR, innerR) {
+  ctx.beginPath();
+  for (let i=0; i<spikes*2; i++) {
+    const r = i%2===0 ? outerR : innerR;
+    const a = (i/spikes)*Math.PI - Math.PI/2;
+    if (i===0) ctx.moveTo(cx+r*Math.cos(a), cy+r*Math.sin(a));
+    else ctx.lineTo(cx+r*Math.cos(a), cy+r*Math.sin(a));
+  }
+  ctx.closePath();
+}
+
+function buildDistChart() {
+  const dk=isDark(); const tick=dk?'#2d4260':'#99afc8';
+  const ctx = document.getElementById('distChart').getContext('2d');
+  if (charts.dist) charts.dist.destroy();
+  const statuses=['COMFORTABLE','TOO COLD','TOO HOT','HUMID HIGH','HUMID LOW'];
+  const colors=['#00f0a0','#38bdf8','#ffa94d','#ffd93d','#c084fc'];
+  // Fake distribution data
+  const data = statuses.map(s => {
+    if(s==='COMFORTABLE') return 42;
+    if(s==='HUMID HIGH') return 31;
+    if(s==='TOO COLD') return 15;
+    if(s==='TOO HOT') return 8;
+    return 4;
+  });
+  charts.dist = new Chart(ctx,{
+    type:'doughnut',
+    data:{labels:statuses,datasets:[{data,backgroundColor:colors,borderWidth:0,hoverOffset:6}]},
+    options:{
+      responsive:true,cutout:'65%',
+      plugins:{
+        legend:{position:'bottom',labels:{color:tick,font:{family:'JetBrains Mono',size:10},boxWidth:8,padding:12}},
+        tooltip:{backgroundColor:dk?'#0c1524':'#fff',titleColor:dk?'#dde8f8':'#0c1524',bodyColor:tick,borderColor:dk?'rgba(255,255,255,.06)':'rgba(0,0,0,.06)',borderWidth:1}
+      }
+    }
+  });
+}
+
+function buildVoteDistChart() {
+  const dk=isDark(); const tick=dk?'#2d4260':'#99afc8'; const grid=dk?'rgba(255,255,255,.04)':'rgba(0,0,0,.04)';
+  const ctx = document.getElementById('voteDistChart').getContext('2d');
+  if (charts.voteDist) charts.voteDist.destroy();
+  const votes = S.votes[S.fpHall];
+  const allTemps = Array.from({length:13},(_,i)=>i+16);
+  const counts = allTemps.map(t=>votes[t]||0);
+  const colors = allTemps.map(t=>{
+    if(t<20) return '#38bdf8';
+    if(t<=24) return '#00f0a0';
+    if(t<=26) return '#ffd93d';
+    return '#ff6b6b';
+  });
+  charts.voteDist = new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:allTemps.map(t=>t+'°C'),
+      datasets:[{data:counts,backgroundColor:colors,borderRadius:4}]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{display:false},tooltip:{backgroundColor:dk?'#0c1524':'#fff',titleColor:dk?'#dde8f8':'#0c1524',bodyColor:tick,borderColor:dk?'rgba(255,255,255,.06)':'rgba(0,0,0,.06)',borderWidth:1}},
+      scales:{
+        x:{ticks:{color:tick,font:{family:'JetBrains Mono',size:9}},grid:{color:grid}},
+        y:{ticks:{color:tick,font:{family:'JetBrains Mono',size:9}},grid:{color:grid}}
+      }
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════════════
+   FLOOR PLAN SVGs
+══════════════════════════════════════════════════════════ */
+const SVG_MAPS = {
+  grand:`<svg viewBox="0 0 400 480" xmlns="http://www.w3.org/2000/svg">
+  <rect x="100" y="10" width="200" height="50" rx="8" fill="none" stroke="var(--a1)" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="200" y="42" text-anchor="middle" font-size="13" fill="var(--a1)" font-family="Epilogue" font-weight="700">STAGE</text>
+  <g fill="none" stroke="var(--t3)" stroke-width="0.7" opacity="0.6">
+    ${Array.from({length:20},(_,r)=>Array.from({length:6},(_,c)=>`<rect x="${28+c*13}" y="${78+r*13}" width="11" height="11" rx="2"/>`).join('')).join('')}
+    ${Array.from({length:20},(_,r)=>Array.from({length:12},(_,c)=>`<rect x="${118+c*13}" y="${78+r*13}" width="11" height="11" rx="2"/>`).join('')).join('')}
+    ${Array.from({length:20},(_,r)=>Array.from({length:6},(_,c)=>`<rect x="${278+c*13}" y="${78+r*13}" width="11" height="11" rx="2"/>`).join('')).join('')}
+    ${Array.from({length:8},(_,r)=>Array.from({length:14},(_,c)=>`<rect x="${100+c*14}" y="${348+r*13}" width="12" height="11" rx="2"/>`).join('')).join('')}
+  </g>
+  <g fill="none" stroke="var(--a5)" stroke-width="0.7" opacity="0.5">
+    ${Array.from({length:4},(_,r)=>Array.from({length:22},(_,c)=>`<rect x="${45+c*14}" y="${454+r*13}" width="12" height="11" rx="2"/>`).join('')).join('')}
+  </g>
+  <text x="200" y="74" text-anchor="middle" font-size="9" fill="var(--t2)" font-family="JetBrains Mono">STALLS 2</text>
+  <text x="200" y="344" text-anchor="middle" font-size="9" fill="var(--t2)" font-family="JetBrains Mono">STALLS 3</text>
+  <text x="200" y="450" text-anchor="middle" font-size="9" fill="var(--a5)" font-family="JetBrains Mono">BALCONY</text>
+</svg>`,
+  yuet:`<svg viewBox="0 0 340 500" xmlns="http://www.w3.org/2000/svg">
+  <rect x="95" y="8" width="150" height="34" rx="6" fill="none" stroke="var(--t3)" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="170" y="29" text-anchor="middle" font-size="9" fill="var(--t2)" font-family="JetBrains Mono">CONTROL ROOM</text>
+  <rect x="55" y="420" width="230" height="55" rx="8" fill="none" stroke="var(--a1)" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="170" y="454" text-anchor="middle" font-size="13" fill="var(--a1)" font-family="Epilogue" font-weight="700">STAGE</text>
+  <g fill="none" stroke="var(--t3)" stroke-width="0.7" opacity="0.6">
+    ${Array.from({length:18},(_,r)=>Array.from({length:10},(_,c)=>`<rect x="${95+c*15}" y="${55+r*19}" width="13" height="15" rx="2"/>`).join('')).join('')}
+    ${Array.from({length:16},(_,r)=>Array.from({length:5},(_,c)=>`<rect x="${18+c*14}" y="${80+r*19}" width="12" height="15" rx="2"/>`).join('')).join('')}
+    ${Array.from({length:16},(_,r)=>Array.from({length:5},(_,c)=>`<rect x="${240+c*14}" y="${80+r*19}" width="12" height="15" rx="2"/>`).join('')).join('')}
+  </g>
+</svg>`
+};
+
+function renderVoteMap() {
+  const m = document.getElementById('voteMap');
+  m.innerHTML = SVG_MAPS[S.selHall];
+  S.markerPos = null;
+  document.getElementById('pinHint').textContent = 'Tap anywhere to place your pin';
+}
+
+function dropPin(e) {
+  if (S.inputMethod !== 'map') return;
+  const map = document.getElementById('voteMap');
+  const rect = map.getBoundingClientRect();
+  const x = ((e.clientX-rect.left)/rect.width*100).toFixed(1);
+  const y = ((e.clientY-rect.top)/rect.height*100).toFixed(1);
+  S.markerPos = {x,y};
+  let pin = document.getElementById('votePin');
+  if (!pin) { pin=document.createElement('div'); pin.id='votePin'; pin.className='pin'; map.appendChild(pin); }
+  pin.style.left=x+'%'; pin.style.top=y+'%';
+  document.getElementById('pinHint').textContent = `📍 Pin at approx. (${x}%, ${y}%) on floor plan`;
+}
+
+/* ══════════════════════════════════════════════════════════
+   VOTE CONTROLS
+══════════════════════════════════════════════════════════ */
+function pickHall(h, btn) {
+  S.selHall=h;
+  document.querySelectorAll('.hs').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if (S.inputMethod==='map') renderVoteMap();
+}
+
+function pickIM(m, btn) {
+  S.inputMethod=m;
+  document.querySelectorAll('.imt').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('typeGrp').style.display = m==='type'?'block':'none';
+  document.getElementById('mapGrp').style.display  = m==='map' ?'block':'none';
+  if (m==='map') renderVoteMap();
+}
+
+const FEELS={16:'VERY COLD',17:'COLD',18:'COOL',19:'SLIGHTLY COOL',20:'COOL',21:'SLIGHTLY COOL',22:'COMFORTABLE',23:'COMFORTABLE',24:'COMFORTABLE',25:'SLIGHTLY WARM',26:'WARM',27:'HOT',28:'VERY HOT'};
+function updateVSlider(v) {
+  document.getElementById('vtempDisp').textContent = v+'°C';
+  document.getElementById('vtempFeel').textContent = FEELS[v]||'';
+  const pct = ((v-16)/(28-16))*100;
+  const c = v<20?'var(--a6)':v<=24?'var(--a2)':'var(--a4)';
+  document.getElementById('vtempDisp').style.color = c;
+  document.getElementById('vtempSlider').style.background =
+    `linear-gradient(to right,${c} ${pct}%,var(--border) ${pct}%)`;
+}
+
+/* ══════════════════════════════════════════════════════════
+   SUBMIT VOTE
+══════════════════════════════════════════════════════════ */
+async function submitVote() {
+  const userId = uid();
+  const banUntil = parseInt(localStorage.getItem(LS.BAN)||'0');
+  if (Date.now() < banUntil) { showBan(banUntil); return; }
+
+  const lastVote = parseInt(localStorage.getItem(LS.VOTE_T)||'0');
+  if (Date.now()-lastVote < C.COOLDOWN) {
+    const left = Math.ceil((C.COOLDOWN-(Date.now()-lastVote))/60000);
+    const cd = document.getElementById('voteCd');
+    cd.style.display='block';
+    cd.textContent = `⏳ Please wait ${left} more minute${left>1?'s':''} before voting again.`;
+    return;
+  }
+
+  // Attempt tracking
+  let tries = JSON.parse(localStorage.getItem(LS.TRIES)||'[]');
+  let win   = parseInt(localStorage.getItem(LS.WIN)||'0');
+  if (Date.now()-win > 30*60*1000) { tries=[]; win=Date.now(); }
+  tries.push(Date.now());
+  if (tries.length >= C.MAX_TRIES) {
+    const exp = Date.now()+C.BAN_DUR;
+    localStorage.setItem(LS.BAN, exp.toString());
+    showBan(exp);
+    logVote({userId,hall:'BAN',seat:'AUTO-BAN',requestedTemp:0,inputMethod:'BANNED',notes:'Banned for rapid repeated votes'});
+    return;
+  }
+  localStorage.setItem(LS.TRIES, JSON.stringify(tries));
+  localStorage.setItem(LS.WIN, win.toString());
+
+  // Validate
+  let seat='';
+  if (S.inputMethod==='type') {
+    seat = document.getElementById('seatIn').value.trim();
+    if (!seat) { toast('Enter your seat number','warning'); return; }
+  } else {
+    if (!S.markerPos) { toast('Drop a pin first','warning'); return; }
+    seat = `Map pin (${S.markerPos.x}%, ${S.markerPos.y}%)`;
+  }
+
+  const rTemp  = parseInt(document.getElementById('vtempSlider').value);
+  const hallNm = S.selHall==='grand' ? 'Grand Hall, Lee Shau Kee' : 'Yuet Ming Auditorium';
+  const btn    = document.getElementById('voteBtn');
+  btn.disabled=true; btn.textContent='Submitting...';
+
+  await logVote({
+    userId, hall:hallNm, seat, requestedTemp:rTemp,
+    inputMethod: S.inputMethod==='type'?'Seat Number':'Map Pin',
+    notes:`Preference: ${FEELS[rTemp]}`
+  });
+
+  S.votes[S.selHall][rTemp] = (S.votes[S.selHall][rTemp]||0)+1;
+  localStorage.setItem(LS.VOTE_T, Date.now().toString());
+
+  document.getElementById('voteOk').style.display='block';
+  document.getElementById('voteCd').style.display='none';
+  btn.textContent='✓ Voted!';
+
+  renderVoteResults();
+  rebuildHeatmap();
+  toast('Vote submitted!','success');
+
+  setTimeout(()=>{ btn.disabled=false; btn.textContent='Submit Vote'; document.getElementById('voteOk').style.display='none'; },120000);
+}
+
+async function logVote(p) {
+  try {
+    await fetch(C.GS, {
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({type:'vote',timestamp:new Date().toISOString(),...p}),
+      mode:'no-cors'
+    });
+  } catch(e){ console.warn('log fail',e); }
+}
+
+function showBan(ts) {
+  document.getElementById('banExpiry').textContent = new Date(ts).toLocaleDateString();
+  document.getElementById('banCard').style.display='block';
+  document.getElementById('voteLayout').style.opacity='.4';
+  document.getElementById('voteLayout').style.pointerEvents='none';
+}
+
+function checkBanOnLoad() {
+  const ban = parseInt(localStorage.getItem(LS.BAN)||'0');
+  if (Date.now()<ban) { showBan(ban); return; }
+  const last = parseInt(localStorage.getItem(LS.VOTE_T)||'0');
+  if (Date.now()-last<C.COOLDOWN) {
+    const left=Math.ceil((C.COOLDOWN-(Date.now()-last))/60000);
+    const cd=document.getElementById('voteCd');
+    cd.style.display='block';
+    cd.textContent=`⏳ You voted recently. Next vote in ${left} minute${left>1?'s':''}.`;
+    document.getElementById('voteBtn').disabled=true;
+    document.getElementById('voteBtn').textContent=`Vote again in ${left}m`;
+  }
+}
+
+function renderVoteResults() {
+  const container = document.getElementById('voteResults');
+  const halls=[{k:'grand',n:'Grand Hall'},{k:'yuet',n:'Yuet Ming Auditorium'}];
+  container.innerHTML = halls.map(hall=>{
+    const v=S.votes[hall.k];
+    const total=Object.values(v).reduce((a,b)=>a+b,0);
+    const max=Math.max(...Object.values(v),1);
+    const sorted=Object.entries(v).sort((a,b)=>b[1]-a[1]);
+    if (!total) return `
+      <div class="vr-hall">
+        <div class="vr-hn">${hall.n}</div>
+        <div style="font-size:11px;color:var(--t3);font-family:var(--mono);padding:10px 0">No votes yet — be the first!</div>
+      </div>`;
+    return `
+      <div class="vr-hall">
+        <div class="vr-hn">${hall.n}</div>
+        <div class="vr-total">${total} vote${total>1?'s':''}</div>
+        ${sorted.map(([t,c])=>`
+          <div class="vbr">
+            <div class="vbt">${t}°C</div>
+            <div class="vbb"><div class="vbf" style="width:${(c/max*100).toFixed(0)}%"></div></div>
+            <div class="vbc">${c}</div>
+          </div>`).join('')}
+      </div>`;
+  }).join('<div class="div"></div>');
+}
+
+/* ══════════════════════════════════════════════════════════
+   COUNTDOWN
+══════════════════════════════════════════════════════════ */
+function resetCd() {
+  S.cdSecs=30;
+  clearInterval(S.cdInterval);
+  S.cdInterval=setInterval(()=>{
+    S.cdSecs--;
+    ['A','B'].forEach(x=>{
+      const el=document.getElementById('cd'+x);
+      if(el) el.style.width=(S.cdSecs/30*100)+'%';
+    });
+    if(S.cdSecs<=0){ clearInterval(S.cdInterval); fetchAll(); }
+  },1000);
+}
+
+/* ══════════════════════════════════════════════════════════
+   REBUILD ALL
+══════════════════════════════════════════════════════════ */
+function rebuildAllCharts() {
+  rebuildHistChart();
+  buildTrendChart();
+  renderAiCard();
+  rebuildHeatmap();
+  renderVoteResults();
+}
+
+/* ══════════════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════════════ */
+function init() {
+  buildWeekGrid();
+  renderVoteResults();
+  updateVSlider(22);
+  checkBanOnLoad();
+  // Seed history so charts aren't empty on first load
+  const seedA = []; const seedB = [];
+  for(let i=0;i<18;i++){
+    const t=new Date(Date.now()-(17-i)*10*60*1000);
+    const hr=t.getHours();
+    const baseA = hr<8?21.5:hr<12?23.5:hr<17?25.8:hr<20?24.2:22.5;
+    const baseB = hr<8?21.0:hr<12?23.0:hr<17?25.2:hr<20?23.8:22.0;
+    seedA.push({ts:t.toISOString(),temp:parseFloat((baseA+(Math.random()-.5)*.8).toFixed(1)),humi:parseFloat((68+(Math.random()-.5)*6).toFixed(1))});
+    seedB.push({ts:t.toISOString(),temp:parseFloat((baseB+(Math.random()-.5)*1.0).toFixed(1)),humi:parseFloat((72+(Math.random()-.5)*6).toFixed(1))});
+  }
+  S.histA = seedA; S.histB = seedB;
+  buildTrendChart();
+  rebuildHistChart();
+  renderAiCard();
+  setTimeout(()=>{ rebuildHeatmap(); }, 200);
+  fetchAll();
+}
+
+window.addEventListener('resize', ()=>{ clearTimeout(window._rt); window._rt=setTimeout(rebuildHeatmap, 200); });
+init();
+</script>
+</body>
+</html>
